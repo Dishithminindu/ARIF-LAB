@@ -1,0 +1,6 @@
+{
+  "name": "ARIF-LAB INVENTORY",
+  "description": "ARIF Laboratory Equipment Inventory, Secure Reservation & Admin System",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
