@@ -61,6 +61,18 @@ export function createApiApp(): express.Express {
     });
   });
 
+  // Global error handler ensuring JSON is always returned
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('Unhandled API Server Error:', err);
+    if (res.headersSent) {
+      return next(err);
+    }
+    res.status(err.status || 500).json({
+      success: false,
+      error: err.message || 'An unexpected internal server error occurred.'
+    });
+  });
+
   return app;
 }
 

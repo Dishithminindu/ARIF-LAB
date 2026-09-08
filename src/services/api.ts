@@ -5,6 +5,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const token = localStorage.getItem('arif_auth_token');
   
   const headers: Record<string, string> = {
+    'Accept': 'application/json',
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {})
   };
@@ -13,19 +14,39 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(endpoint, {
-    ...options,
-    headers,
-    credentials: 'same-origin'
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || `HTTP error ${response.status}`);
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      ...options,
+      headers,
+      credentials: 'same-origin'
+    });
+  } catch (networkError: any) {
+    throw new Error(networkError.message || 'Unable to connect to the laboratory server. Please check your network connection.');
   }
 
-  return data as T;
+  // Safely extract text to prevent "Unexpected end of JSON input" on empty responses
+  const rawText = await response.text();
+  let data: any = null;
+
+  if (rawText && rawText.trim().length > 0) {
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      // If response is HTML (e.g. Cloudflare Access login wall or proxy 502 page)
+      if (rawText.includes('<!DOCTYPE') || rawText.includes('<html') || rawText.includes('Cloudflare Access')) {
+        throw new Error('Cloudflare Access or security firewall is intercepting server requests. Please ensure Cloudflare Access is disabled for this domain.');
+      }
+      data = null;
+    }
+  }
+
+  if (!response.ok) {
+    const errorMessage = data?.error || data?.message || (rawText && rawText.length < 150 ? rawText : `Server responded with status ${response.status}`);
+    throw new Error(errorMessage);
+  }
+
+  return (data !== null ? data : {}) as T;
 }
 
 export const api = {
