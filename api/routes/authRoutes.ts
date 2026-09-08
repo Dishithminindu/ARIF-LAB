@@ -12,6 +12,15 @@ import {
 
 const router = Router();
 
+// Helper to extract real client IP (supporting CF-Connecting-IP, X-Forwarded-For, etc.)
+function getClientIp(req: AuthenticatedRequest): string {
+  const cfIp = req.headers['cf-connecting-ip'];
+  if (typeof cfIp === 'string') return cfIp;
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') return forwarded.split(',')[0].trim();
+  return req.ip || req.socket.remoteAddress || 'unknown';
+}
+
 /**
  * POST /api/auth/register
  * Secure Student Registration
@@ -119,7 +128,8 @@ router.post('/register', rateLimit(60000, 10), async (req: AuthenticatedRequest,
       entity_type: 'user',
       entity_id: newUser.id,
       description: `New student account registered: ${newUser.full_name} (${newUser.student_id}) - ${newUser.department}`,
-      ip_address: req.ip
+      ip_address: getClientIp(req),
+      user_agent: req.headers['user-agent']
     });
 
     return res.status(201).json({
@@ -185,7 +195,8 @@ router.post('/login', rateLimit(60000, 15), async (req: AuthenticatedRequest, re
         action: 'FAILED_LOGIN_ATTEMPT',
         entity_type: 'auth',
         description: `Failed login attempt for user ${user.email}`,
-        ip_address: req.ip
+        ip_address: getClientIp(req),
+        user_agent: req.headers['user-agent']
       });
 
       return res.status(401).json({
@@ -215,7 +226,8 @@ router.post('/login', rateLimit(60000, 15), async (req: AuthenticatedRequest, re
       action: 'USER_LOGIN',
       entity_type: 'auth',
       description: `User logged in successfully (${user.role.toUpperCase()})`,
-      ip_address: req.ip
+      ip_address: getClientIp(req),
+      user_agent: req.headers['user-agent']
     });
 
     return res.json({

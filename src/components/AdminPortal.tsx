@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeUser, Equipment, Reservation, AuditLog, SiteContent } from '../../api/types';
+import type { SafeUser, Equipment, Reservation, AuditLog, SiteContent } from '../types/api';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { ReservationBadge } from './ReservationBadge';
@@ -972,9 +972,16 @@ export const AdminPortal: React.FC = () => {
                     {new Date(log.timestamp).toLocaleString()}
                   </span>
                 </div>
-                <p className="text-slate-600 dark:text-zinc-400">
-                  {log.description}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-slate-600 dark:text-zinc-400">
+                    {log.description}
+                  </p>
+                  {log.ip_address && (
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-sm">
+                      IP: {log.ip_address}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>

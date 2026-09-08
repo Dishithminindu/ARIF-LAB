@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReservationStatus } from '../../api/types';
+import type { ReservationStatus } from '../types/api';
 import { Clock, CheckCircle2, XCircle, Ban, CheckCheck } from 'lucide-react';
 
 interface ReservationBadgeProps {

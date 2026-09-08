@@ -11,6 +11,9 @@ import contentRoutes from './routes/contentRoutes';
 export function createApiApp(): express.Express {
   const app = express();
 
+  // Trust reverse proxies (Cloudflare, Cloud Run, Nginx) for accurate client IP detection
+  app.set('trust proxy', true);
+
   // Basic security and parsing middlewares
   app.use(cors({
     origin: true,

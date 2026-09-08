@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { SiteContent } from '../../api/types';
+import type { SiteContent } from '../types/api';
 import { X, ShieldAlert, FileText, Clock, Phone, MapPin, CheckCircle2 } from 'lucide-react';
 
 interface SafetyModalProps {

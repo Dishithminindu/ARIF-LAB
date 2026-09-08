@@ -3,7 +3,28 @@ import jwt from 'jsonwebtoken';
 import { db } from './db';
 import { AuthJWTPayload, SafeUser } from './types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'arif_lab_super_secure_jwt_secret_key_2026_x98kL#mQ!';
+/**
+ * CRITICAL SECURITY ARCHITECTURE:
+ * 1. JWT_SECRET is strictly a private, server-side secret key used exclusively on the Node.js backend
+ *    to sign and verify HMAC-SHA256 authentication tokens.
+ * 2. It must NEVER be exposed to browser JavaScript, never bundled into client assets,
+ *    never sent in API responses, and never prefixed with VITE_.
+ * 3. In production environments, JWT_SECRET must be configured as a secure server-only environment variable.
+ */
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'CRITICAL SECURITY CONFIGURATION ERROR: JWT_SECRET environment variable is missing on the server in production. ' +
+        'It must be configured securely on the server and must NEVER be exposed to browser JavaScript.'
+      );
+    }
+    return 'arif_lab_dev_only_jwt_secret_key_change_in_production_environment!';
+  }
+  return secret;
+}
+
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';
 
 export interface AuthenticatedRequest extends Request {
@@ -23,7 +44,7 @@ export function generateToken(user: SafeUser): string {
     name: user.full_name
   };
 
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: (JWT_EXPIRY as any) || '7d' });
 }
 
 /**
@@ -119,7 +140,7 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthJWTPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as AuthJWTPayload;
     const user = db.findUserById(decoded.userId);
 
     if (!user) {

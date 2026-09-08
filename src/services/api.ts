@@ -1,4 +1,4 @@
-import { SafeUser, Equipment, Reservation, AuditLog, SiteContent } from '../../api/types';
+import type { SafeUser, Equipment, Reservation, AuditLog, SiteContent } from '../types/api';
 
 // API Client Helper
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
