@@ -80,7 +80,7 @@ export const AuthModal: React.FC = () => {
   };
 
   const fillDemoStudent = () => {
-    setLoginIdentifier('s20001151@ousl.lk');
+    setLoginIdentifier('student.demo@ariflab.edu');
     setLoginPassword('Student@ARIF2026!');
     handleClearStatus();
   };
@@ -106,11 +106,11 @@ export const AuthModal: React.FC = () => {
     handleClearStatus();
 
     if (regPassword !== regConfirmPassword) {
-      setErrorMessage('Passwords do not match.');
+      setErrorMessage('Passwords do not match. Please ensure both password fields are identical.');
       return;
     }
-    if (regPassword.length < 8) {
-      setErrorMessage('Password must be at least 8 characters with upper/lowercase & numbers.');
+    if (regPassword.length < 6) {
+      setErrorMessage('Password must be at least 6 characters in length.');
       return;
     }
 
@@ -242,9 +242,39 @@ export const AuthModal: React.FC = () => {
           
           {/* Notifications */}
           {errorMessage && (
-            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
-              <span>{errorMessage}</span>
+            <div 
+              id="auth-error-banner"
+              className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/70 text-rose-800 dark:text-rose-200 text-xs flex items-start justify-between gap-3 animate-in fade-in"
+            >
+              <div className="flex items-start gap-2.5 flex-1">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
+                <div className="space-y-1.5 flex-1">
+                  <p className="font-medium leading-relaxed">{errorMessage}</p>
+                  {(errorMessage.toLowerCase().includes('already exists') || errorMessage.toLowerCase().includes('log in')) && (
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginIdentifier(regEmail || regStudentId);
+                          handleTabSwitch('login');
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                      >
+                        <span>Sign In Now</span>
+                        <span aria-hidden="true">→</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setErrorMessage(null)}
+                className="text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-200 p-1 rounded-md hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors"
+                title="Dismiss error"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
@@ -285,7 +315,7 @@ export const AuthModal: React.FC = () => {
                     required
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="e.g. s20001151@ousl.lk or S20001151"
+                    placeholder="e.g. student@ousl.lk or S12345678"
                     className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 text-sm text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-colors"
                   />
                 </div>
@@ -513,7 +543,7 @@ export const AuthModal: React.FC = () => {
                       required
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="Min. 8 chars"
+                      placeholder="Min. 6 chars"
                       className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-zinc-100 font-mono"
                     />
                   </div>
@@ -575,7 +605,7 @@ export const AuthModal: React.FC = () => {
                     required
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="e.g. s20001151@ousl.lk"
+                    placeholder="e.g. student@ousl.lk"
                     className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 text-sm text-slate-900 dark:text-zinc-100"
                   />
                 </div>

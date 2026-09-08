@@ -70,17 +70,8 @@ export function extractToken(req: Request): string | null {
  * Requirements: >= 8 chars, at least 1 uppercase, 1 lowercase, 1 digit or special character
  */
 export function validatePasswordStrength(password: string): { valid: boolean; message?: string } {
-  if (!password || password.length < 8) {
-    return { valid: false, message: 'Password must be at least 8 characters in length.' };
-  }
-  if (!/[A-Z]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one uppercase letter (A-Z).' };
-  }
-  if (!/[a-z]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one lowercase letter (a-z).' };
-  }
-  if (!/[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one number or special symbol.' };
+  if (!password || password.length < 6) {
+    return { valid: false, message: 'Password must be at least 6 characters in length.' };
   }
   return { valid: true };
 }
